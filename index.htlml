@@ -1,94 +1,34 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Mapa Interativo</title>
-    <style>
-      #map {
-        height: 400px;
-        width: 100%;
-      }
-    </style>
-    <script src="AIzaSyA7iHXjxOwS0VE1Jx9rH3XJJY-iqSQ4g-g"></script>
-    <script>
-      let map, directionsService, directionsRenderer;
+<head>
+  <title>RTL</title>
+  <style>
+    /* Estilo para o corpo da página */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
 
-      function initMap() {
-        map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 0, lng: 0 },
-          zoom: 8,
-        });
+    /* Estilo para o mapa */
+    #map {
+      width: 100%;
+      height: 400px;
+    }
 
-        const input = document.getElementById("search-input");
-        const searchBox = new google.maps.places.SearchBox(input);
+    /* Estilo para o elemento do tempo */
+    #time {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="time"></div>
 
-        map.addListener("bounds_changed", () => {
-          searchBox.setBounds(map.getBounds());
-        });
-
-        searchBox.addListener("places_changed", () => {
-          const places = searchBox.getPlaces();
-
-          if (places.length === 0) {
-            return;
-          }
-
-          const bounds = new google.maps.LatLngBounds();
-          places.forEach((place) => {
-            if (!place.geometry || !place.geometry.location) {
-              console.log("Local inválido: ", place);
-              return;
-            }
-
-            if (place.geometry.viewport) {
-              bounds.union(place.geometry.viewport);
-            } else {
-              bounds.extend(place.geometry.location);
-            }
-          });
-
-          map.fitBounds(bounds);
-        });
-
-        directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
-
-        setInterval(getCurrentTime, 1000);
-      }
-
-      function getCurrentTime() {
-        const currentTime = new Date().toLocaleTimeString();
-        document.getElementById("current-time").textContent = "Tempo atual: " + currentTime;
-      }
-
-      function calculateRoute() {
-        const start = document.getElementById("start-input").value;
-        const end = document.getElementById("end-input").value;
-
-        const request = {
-          origin: start,
-          destination: end,
-          travelMode: google.maps.TravelMode.DRIVING,
-        };
-
-        directionsService.route(request, (result, status) => {
-          if (status == google.maps.DirectionsStatus.OK) {
-            directionsRenderer.setDirections(result);
-          } else {
-            console.log("Não foi possível calcular a rota: ", status);
-          }
-        });
-      }
-    </script>
-  </head>
-  <body onload="initMap()">
-    <div>
-      <input id="search-input" type="text" placeholder="Pesquisar">
-      <input id="start-input" type="text" placeholder="Partida">
-      <input id="end-input" type="text" placeholder="Destino">
-      <button onclick="calculateRoute()">Traçar Rota</button>
-    </div>
-    <div id="map"></div>
-    <div id="current-time"></div>
-  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>

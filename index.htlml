@@ -1,34 +1,86 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>RTL</title>
-  <style>
-    /* Estilo para o corpo da página */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-    }
+#include <TinyGPS++.h>
+#include <SoftwareSerial.h>
+#include <WiFiClientSecure.h>
 
-    /* Estilo para o mapa */
-    #map {
-      width: 100%;
-      height: 400px;
-    }
+// Define os pinos RX e TX para o módulo GPS
+const int gpsRXPin = 10;
+const int gpsTXPin = 11;
 
-    /* Estilo para o elemento do tempo */
-    #time {
-      font-size: 24px;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div id="map"></div>
-  <div id="time"></div>
+// Configura a taxa de comunicação serial com o módulo GPS
+const uint32_t gpsBaud = 9600;
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-  <script src="script.js"></script>
-</body>
-</html>
+// Chave da API do serviço de mapa
+const char* apiKey = "AIzaSyA7iHXjxOwS0VE1Jx9rH3XJJY-iqSQ4g-g";
+
+// Cria uma instância do objeto GPS
+TinyGPSPlus gps;
+
+// Cria uma instância da comunicação serial com o módulo GPS
+SoftwareSerial gpsSerial(gpsRXPin, gpsTXPin);
+
+void setup()
+{
+  // Inicializa a comunicação serial
+  Serial.begin(9600);
+  gpsSerial.begin(gpsBaud);
+
+  // Inicializa a conexão WiFi (se necessário)
+  // Exemplo de conexão usando ESP8266:
+  //WiFi.begin("NOME_DA_REDE", "SENHA_DA_REDE");
+  //while (WiFi.status() != WL_CONNECTED) {
+  //  delay(1000);
+  //  Serial.println("Conectando ao WiFi...");
+  //}
+  //Serial.println("Conexão WiFi estabelecida!");
+}
+
+void loop()
+{
+  while (gpsSerial.available() > 0)
+  {
+    if (gps.encode(gpsSerial.read()))
+    {
+      if (gps.location.isUpdated())
+      {
+        // Obtém a latitude e longitude
+        float latitude = gps.location.lat();
+        float longitude = gps.location.lng();
+
+        // Obtém o horário
+        int hour = gps.time.hour();
+        int minute = gps.time.minute();
+        int second = gps.time.second();
+
+        // Exibe as informações no monitor serial
+        Serial.print("Latitude: ");
+        Serial.println(latitude, 6);
+        Serial.print("Longitude: ");
+        Serial.println(longitude, 6);
+        Serial.print("Horário: ");
+        Serial.print(hour);
+        Serial.print(":");
+        Serial.print(minute);
+        Serial.print(":");
+        Serial.println(second);
+
+        // Realize a chamada à API do mapa usando a chave de API
+        // Exemplo de código para fazer uma solicitação usando a biblioteca WiFiClientSecure
+        //WiFiClientSecure client;
+        //client.setInsecure(); // Usado se a API não requer verificação de certificado SSL
+        //if (client.connect("api.exemplo.com", 443)) {
+        //  String request = "/mapa?lat=" + String(latitude) + "&lon=" + String(longitude) + "&apiKey=" + apiKey;
+        //  client.print(String("GET ") + request + " HTTP/1.1\r\n" +
+        //               "Host: api.exemplo.com\r\n" +
+        //               "Connection: close\r\n\r\n");
+        //  while (client.connected()) {
+        //    if (client.available()) {
+        //      String line = client.readStringUntil('\r');
+        //      // Processar a resposta da API, se necessário
+        //    }
+        //  }
+        //  client.stop();
+        //}
+      }
+    }
+  }
+}

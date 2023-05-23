@@ -50,7 +50,7 @@
   </script>
 
   <!-- Incluir a API do Google Maps JavaScript -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWkaQS33nOpmPRkOOLDchNlbqX5iV64Ac" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBf2a8jJFDPp9gPOzdi9tirTZKomFjTmZc" async defer></script>
 </body>
 </html>
 
